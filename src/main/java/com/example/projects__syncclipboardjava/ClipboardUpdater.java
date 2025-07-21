@@ -25,8 +25,11 @@ public class ClipboardUpdater implements Runnable {
                 String lastApplied = Files.exists(appliedRecord) ? new String(Files.readAllBytes(appliedRecord)).trim()
                         : "";
 
-                List<Path> files = Files.list(syncDir).filter(p -> p.toString().endsWith(".txt"))
-                        .sorted(Comparator.reverseOrder()).collect(Collectors.toList());
+                List<Path> files;
+                try (Stream<Path> stream = Files.list(syncDir)) {
+                    files = stream.filter(p -> p.toString().endsWith(".txt")).sorted(Comparator.reverseOrder())
+                            .collect(Collectors.toList());
+                }
 
                 for (Path file : files) {
                     if (file.getFileName().toString().equals(lastApplied))
